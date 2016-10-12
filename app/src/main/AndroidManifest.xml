@@ -22,7 +22,8 @@
             android:name=".WeatherDetailActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_weather_detail"
-            android:theme="@style/FullscreenTheme"></activity>
+            android:theme="@style/FullscreenTheme" />
+        <activity android:name=".DetailsActivity"></activity>
     </application>
 
 </manifest>

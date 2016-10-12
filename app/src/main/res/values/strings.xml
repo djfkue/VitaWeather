@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/tools">
     <string name="app_name">weather</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -9,4 +9,17 @@
     <string name="title_activity_weather_detail">WeatherDetailActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <!-- Key name for temperature unit preference in SharedPreferences [CHAR LIMIT=NONE] -->
+    <string name="pref_units_key" translatable="false">units</string>
+
+    <!-- Value in SharedPreferences for metric temperature unit option [CHAR LIMIT=NONE] -->
+    <string name="pref_units_metric" translatable="false">metric</string>
+
+    <string name="format_temperature"><xliff:g id="temp">%1.0f</xliff:g>\u00B0</string>
+    <string name="format_temperature_max">\u2191<xliff:g id="temp">%1.0f</xliff:g>\u00B0</string>
+    <string name="format_temperature_min">\u2193<xliff:g id="temp">%1.0f</xliff:g>\u00B0</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
