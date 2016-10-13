@@ -9,6 +9,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -306,8 +307,15 @@ public class MainActivity extends AppCompatActivity
 
             if (!mIsDetailsActivityStarted) {
                 mIsDetailsActivityStarted = true;
-                startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(MainActivity.this,
-                        weatherBg, weatherBg.getTransitionName()).toBundle());
+                ActivityOptions options =
+                        ActivityOptions.makeSceneTransitionAnimation(
+                                MainActivity.this,
+                                Pair.create((View)weatherBg, weatherBg.getTransitionName()),
+                                Pair.create(v, getString(R.string
+                                        .transition_shot_background)));
+                startActivity(intent,
+                        options.toBundle());
+                getWindow().setExitTransition(null);
             }
         }
     }
