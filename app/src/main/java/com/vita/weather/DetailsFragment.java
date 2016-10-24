@@ -23,6 +23,7 @@ public class DetailsFragment extends Fragment {
 
     private static final String ARG_ALBUM_IMAGE_POSITION = "arg_album_image_position";
     private static final String ARG_STARTING_ALBUM_IMAGE_POSITION = "arg_starting_album_image_position";
+    private View background;
 
     public static DetailsFragment newInstance(int position, int startingPosition) {
         Bundle args = new Bundle();
@@ -57,9 +58,10 @@ public class DetailsFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
+
         weatherBackground = (ImageView) rootView.findViewById(R.id.weather_bg);
-        String albumName = WeatherDataModel.getInstance(getContext()).getDataArrayList().get(mAlbumPosition).city;
-        weatherBackground.setTransitionName(albumName);
+        String city = WeatherDataModel.getInstance(getContext()).getDataArrayList().get(mAlbumPosition).city;
+        weatherBackground.setTransitionName(city);
         weatherBackground.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {
@@ -68,6 +70,9 @@ public class DetailsFragment extends Fragment {
                 return true;
             }
         });
+
+        background = rootView.findViewById(R.id.background);
+        background.setTransitionName(city + getString(R.string.transition_shot_background));
 
         if (mIsTransitioning) {
             getActivity().getWindow().getSharedElementEnterTransition().addListener(new Transition.TransitionListener() {
@@ -111,6 +116,10 @@ public class DetailsFragment extends Fragment {
             return weatherBackground;
         }
         return null;
+    }
+
+    View getViewBackground() {
+        return background;
     }
 
     /**

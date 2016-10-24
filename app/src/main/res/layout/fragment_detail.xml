@@ -6,6 +6,12 @@
     android:fitsSystemWindows="false"
     tools:context="com.vita.weather.DetailsFragment">
 
+    <View
+        android:id="@+id/background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#1A4F83"/>
+
     <android.support.percent.PercentRelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

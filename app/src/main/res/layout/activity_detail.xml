@@ -6,13 +6,6 @@
     android:layout_height="match_parent"
     tools:context="com.vita.weather.DetailsActivity">
 
-    <View
-        android:id="@+id/background"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/background_light"
-        android:transitionName="@string/transition_shot_background" />
-
     <android.support.v4.view.ViewPager
         android:id="@+id/pager"
         android:layout_width="match_parent"

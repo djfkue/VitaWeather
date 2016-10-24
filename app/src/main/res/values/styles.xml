@@ -22,7 +22,12 @@
              as a shared element. -->
         <!--<item name="android:windowTranslucentStatus">true</item>-->
         <!--<item name="android:statusBarColor">@android:color/black</item>-->
+
+        <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowBackground">@color/scrim</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowSharedElementEnterTransition">@transition/detail_shared_enter</item>
         <item name="android:windowEnterTransition">@transition/details_window_enter_transition</item>
         <item name="android:windowReturnTransition">@transition/details_window_return_transition</item>
     </style>
@@ -55,6 +60,8 @@
 
     <style name="Vita.Translucent">
         <!-- using a semi-transparent window background for the drag-back gesture -->
+
+        <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowBackground">@color/scrim</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowContentOverlay">@null</item>
@@ -64,6 +71,7 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:colorControlActivated">?android:colorAccent</item>
         <item name="android:windowAllowReturnTransitionOverlap">false</item>
+        <item name="android:windowSharedElementEnterTransition">@transition/detail_shared_enter</item>
         <item name="android:windowEnterTransition">@transition/details_window_enter_transition</item>
         <item name="android:windowReturnTransition">@transition/details_window_return_transition</item>
     </style>

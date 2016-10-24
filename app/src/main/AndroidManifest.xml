@@ -19,8 +19,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".DetailsActivity"
-            android:theme="@style/Vita.Translucent">
+            android:theme="@style/AppTheme.Details">
 
+        <!--<activity android:name=".DetailsActivity"-->
+            <!--android:theme="@style/Vita.Translucent">-->
         </activity>
     </application>
 

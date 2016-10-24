@@ -1,5 +1,8 @@
 package com.vita.weather;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.ActivityOptions;
 import android.app.SharedElementCallback;
 import android.content.Context;
@@ -7,8 +10,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.ViewPropertyAnimatorCompat;
+import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
+import android.transition.Transition;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,9 +28,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.ViewAnimator;
 
 import com.vita.weather.data.WeatherData;
 import com.vita.weather.data.WeatherDataModel;
@@ -60,6 +69,11 @@ public class MainActivity extends AppCompatActivity
                         sharedElements.clear();
                         sharedElements.put(newTransitionName, newSharedElement);
                     }
+
+                    String bgName = newTransitionName + getString(R.string.transition_shot_background);
+                    View background = recyclerView.findViewWithTag(bgName);
+                    names.add(bgName);
+                    sharedElements.put(bgName, background);
                 }
 
                 mTmpReenterState = null;
@@ -78,6 +92,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
     };
+    private WeatherCardAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +125,12 @@ public class MainActivity extends AppCompatActivity
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        WeatherCardAdapter adapter = new WeatherCardAdapter(this);
+        RecyclerView.ItemAnimator animator = recyclerView.getItemAnimator();
+        if (animator instanceof SimpleItemAnimator) {
+            ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
+        }
+
+        adapter = new WeatherCardAdapter(this);
         recyclerView.setAdapter(adapter);
 
         setExitSharedElementCallback(mCallback);
@@ -127,7 +147,7 @@ public class MainActivity extends AppCompatActivity
         super.onActivityReenter(requestCode, data);
         mTmpReenterState = new Bundle(data.getExtras());
         int startingPosition = mTmpReenterState.getInt(EXTRA_STARTING_ALBUM_POSITION);
-        int currentPosition = mTmpReenterState.getInt(EXTRA_CURRENT_ALBUM_POSITION);
+        final int currentPosition = mTmpReenterState.getInt(EXTRA_CURRENT_ALBUM_POSITION);
         if (startingPosition != currentPosition) {
             recyclerView.scrollToPosition(currentPosition);
         }
@@ -140,6 +160,36 @@ public class MainActivity extends AppCompatActivity
                 recyclerView.requestLayout();
                 startPostponedEnterTransition();
                 return true;
+            }
+        });
+
+        getWindow().getSharedElementReenterTransition().addListener(new Transition.TransitionListener() {
+            @Override
+            public void onTransitionStart(Transition transition) {
+
+            }
+
+            @Override
+            public void onTransitionEnd(Transition transition) {
+                getWindow().getSharedElementReenterTransition().removeListener(this);
+                CardHolder cardHolder
+                        = (CardHolder) recyclerView.findViewHolderForAdapterPosition(currentPosition);
+                cardHolder.restoreVisiblity();
+            }
+
+            @Override
+            public void onTransitionCancel(Transition transition) {
+
+            }
+
+            @Override
+            public void onTransitionPause(Transition transition) {
+
+            }
+
+            @Override
+            public void onTransitionResume(Transition transition) {
+
             }
         });
     }
@@ -243,6 +293,8 @@ public class MainActivity extends AppCompatActivity
         TextView tempMax;
         TextView tempMin;
 
+        View background;
+
         int position;
 
         public CardHolder(View v) {
@@ -263,6 +315,8 @@ public class MainActivity extends AppCompatActivity
             tempMin.setTypeface(Utils.getRobotoThinTypeface(v.getContext()));
 
             weatherIcon = (ImageView) v.findViewById(R.id.weather_icon);
+
+            background = v.findViewById(R.id.background);
 
             itemView.setOnClickListener(this);
 
@@ -298,25 +352,98 @@ public class MainActivity extends AppCompatActivity
             weatherBg.setTransitionName(data.city);
             weatherBg.setTag(data.city);
 
+            String bgTag = data.city + getString(R.string.transition_shot_background);
+            background.setTransitionName(bgTag);
+            background.setTag(bgTag);
+
         }
 
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
-            intent.putExtra(EXTRA_STARTING_ALBUM_POSITION, position);
 
-            if (!mIsDetailsActivityStarted) {
-                mIsDetailsActivityStarted = true;
-                ActivityOptions options =
-                        ActivityOptions.makeSceneTransitionAnimation(
-                                MainActivity.this,
-                                Pair.create((View)weatherBg, weatherBg.getTransitionName()),
-                                Pair.create(v, getString(R.string
-                                        .transition_shot_background)));
-                startActivity(intent,
-                        options.toBundle());
-                getWindow().setExitTransition(null);
-            }
+            AnimatorSet animatorSet = new AnimatorSet();
+            animatorSet.setDuration(50);
+
+//            ViewPropertyAnimator iconAnimator = weatherIcon.animate();
+//            iconAnimator.alpha(0.0f);
+
+            ObjectAnimator cityAnimator = ObjectAnimator.ofFloat(city, "alpha", 1, 0.5f);
+
+            ObjectAnimator tempCurAnimator = ObjectAnimator.ofFloat(tempCurrent, "alpha", 1, 0.5f);
+            ObjectAnimator highAnimator = ObjectAnimator.ofFloat(tempMax, "alpha", 1, 0.5f);
+            ObjectAnimator lowAnimator = ObjectAnimator.ofFloat(tempMin, "alpha", 1, 0.5f);
+
+//            ViewPropertyAnimator cityAnimator = city.animate().alpha(0.0f);
+//            ViewPropertyAnimator tempCurAnimator = tempCurrent.animate().alpha(0.0f);
+//            ViewPropertyAnimator highAnimator = tempMax.animate().alpha(0.0f);
+//            ViewPropertyAnimator lowAnimator = tempMin.animate().alpha(0.0f);
+
+            animatorSet.playTogether(
+                    cityAnimator,
+                    tempCurAnimator,
+                    highAnimator,
+                    lowAnimator);
+            animatorSet.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animator) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animator) {
+                    Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
+                    intent.putExtra(EXTRA_STARTING_ALBUM_POSITION, position);
+
+                    if (!mIsDetailsActivityStarted) {
+                        mIsDetailsActivityStarted = true;
+                        ActivityOptions options =
+                                ActivityOptions.makeSceneTransitionAnimation(
+                                        MainActivity.this,
+                                        Pair.create((View)weatherBg, weatherBg.getTransitionName()),
+                                        Pair.create(background, background.getTransitionName()));
+                        startActivity(intent,
+                                options.toBundle());
+                        getWindow().setExitTransition(null);
+                    }
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animator) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animator) {
+
+                }
+            });
+            animatorSet.start();
+
+        }
+
+        public void restoreVisiblity() {
+            AnimatorSet animatorSet = new AnimatorSet();
+            animatorSet.setDuration(250);
+
+            ObjectAnimator iconAnimator = ObjectAnimator.ofFloat(weatherIcon, "alpha", 0, 1);
+            ObjectAnimator cityAnimator = ObjectAnimator.ofFloat(city, "alpha", 0, 1);
+
+            ObjectAnimator tempCurAnimator = ObjectAnimator.ofFloat(tempCurrent, "alpha", 0, 1);
+            ObjectAnimator highAnimator = ObjectAnimator.ofFloat(tempMax, "alpha", 0, 1);
+            ObjectAnimator lowAnimator = ObjectAnimator.ofFloat(tempMin, "alpha", 0, 1);
+
+//            ViewPropertyAnimator cityAnimator = city.animate().alpha(0.0f);
+//            ViewPropertyAnimator tempCurAnimator = tempCurrent.animate().alpha(0.0f);
+//            ViewPropertyAnimator highAnimator = tempMax.animate().alpha(0.0f);
+//            ViewPropertyAnimator lowAnimator = tempMin.animate().alpha(0.0f);
+            animatorSet.setInterpolator(new FastOutSlowInInterpolator());
+            animatorSet.playTogether(
+                    iconAnimator,
+                    cityAnimator,
+                    tempCurAnimator,
+                    highAnimator,
+                    lowAnimator);
+            animatorSet.start();
         }
     }
 }

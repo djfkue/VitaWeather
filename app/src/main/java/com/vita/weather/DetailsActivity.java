@@ -31,6 +31,7 @@ public class DetailsActivity extends AppCompatActivity {
         public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
             if (mIsReturning) {
                 ImageView sharedElement = mCurrentDetailsFragment.getWeatherBackground();
+                View background = mCurrentDetailsFragment.getViewBackground();
                 if (sharedElement == null) {
                     // If shared element is null, then it has been scrolled off screen and
                     // no longer visible. In this case we cancel the shared element transition by
@@ -46,6 +47,9 @@ public class DetailsActivity extends AppCompatActivity {
                     sharedElements.clear();
                     sharedElements.put(sharedElement.getTransitionName(), sharedElement);
                 }
+
+                names.add(background.getTransitionName());
+                sharedElements.put(background.getTransitionName(), background);
             }
         }
     };
